@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 
 LOGGER = logging.getLogger(__name__)
 
-RADIO_MENU_ID = "radios"
+# Node ids of SqueezePlay's built-in menus ("myMusic" maps to its "_myMusic").
+RADIO_NODE = "radios"
+MUSIC_NODE = "myMusic"
 SERVER_VERSION = "9.0.0"
 
 
@@ -38,18 +40,22 @@ class CommandHandler:
         return await method(cmd)
 
     def home_menu(self) -> list[dict[str, Any]]:
-        # Same id and action as LMS's own entry: the player skin shows its
-        # built-in radio icon for id "radios", and "go" opens a browse window
-        # (with artwork) from the `radios ... menu:radio` command below.
-        return [
-            {
-                "id": RADIO_MENU_ID,
-                "text": "Internet Radio",
-                "node": "home",
-                "weight": 20,
-                "actions": {"go": {"cmd": ["radios"], "params": {"menu": "radio"}}},
-            }
-        ]
+        """Stations for the player's own menu nodes.
+
+        SqueezePlay (Radio, Touch, Boom) has local "Internet Radio" (id
+        `radios`, with its own icon) and "My Music" nodes. It ignores a server
+        item with id `radios`, and shows a node only once items are placed in
+        it, so each station goes into both nodes by `node`.
+        """
+        items = []
+        for node, prefix in ((RADIO_NODE, "minilms_radio"), (MUSIC_NODE, "minilms_music")):
+            for weight, station_item in enumerate(self.station_items(), start=1):
+                items.append(
+                    {**station_item, "id": f"{prefix}_{station_item['station']}", "node": node, "weight": weight}
+                )
+        for item in items:
+            item.pop("station")
+        return items
 
     def station_items(self) -> list[dict[str, Any]]:
         items = []
@@ -61,6 +67,7 @@ class CommandHandler:
                 "nextWindow": "nowPlaying",
             }
             item: dict[str, Any] = {
+                "station": station.id,
                 "text": station.name,
                 "style": "itemplay",
                 "nextWindow": "nowPlaying",
@@ -113,6 +120,17 @@ class CommandHandler:
         result["uuid"] = self.app.server_uuid
         return result
 
+    async def cmd_status(self, cmd: SlimCLICommand) -> Any:
+        # Private aioslimproto method; safe while the version stays pinned.
+        result = await self.app.server.cli._handle_status(  # noqa: SLF001
+            cmd.player_id or "", *cmd.args, **cmd.kwargs
+        )
+        # With nothing playing aioslimproto sends "item_loop": [], and
+        # SqueezePlay's _whatsPlaying() then indexes item_loop[1] and crashes.
+        if isinstance(result, dict) and result.get("item_loop") == []:
+            del result["item_loop"]
+        return result
+
     async def cmd_alarms(self, cmd: SlimCLICommand) -> dict[str, Any]:
         return {"count": 0, "fade": "0", "alarms_loop": []}
 
@@ -128,7 +146,7 @@ class CommandHandler:
             return {"count": 0, "radioss_loop": []}
         offset = _int(cmd.args[0] if cmd.args else 0, 0)
         limit = _int(cmd.args[1] if len(cmd.args) > 1 else 100, 100)
-        items = self.station_items()
+        items = [{k: v for k, v in i.items() if k != "station"} for i in self.station_items()]
         return {
             "item_loop": items[offset : offset + limit],
             "offset": offset,

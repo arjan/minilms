@@ -25,6 +25,7 @@ def app(tmp_path):
     [
         ("", "Squeezebox Radio"),  # nothing reported yet
         ("controller: 00:04:20:aa:bb:", "Squeezebox Radio"),  # stored placeholder
+        ("Squeezebox Radi", "Squeezebox Radio"),  # stored, cut-off model name
         ("Kitchen", "Kitchen"),  # a real name stays
     ],
 )

@@ -213,16 +213,23 @@ class MiniLMS:
     def _apply_name(self, player: SlimClient) -> None:
         """Use the configured name, else the model name for an unusable one.
 
-        aioslimproto names a player that reports nothing "<type>: <mac>", and the
-        Squeezebox Radio reports a stored, truncated name of that same form. Sets
-        a private attribute; safe while aioslimproto stays pinned.
+        aioslimproto names a player that reports nothing "<type>: <mac>". The
+        Squeezebox Radio reports a stored, truncated name: either of that form
+        or a cut-off model name ("Squeezebox Radi"). Sets a private attribute;
+        safe while aioslimproto stays pinned.
         """
         name = self.config.player_names.get(player.player_id)
         if not name:
             reported = player._device_name  # noqa: SLF001
-            if reported and not reported.startswith(f"{player.device_type}:"):
+            model = player.device_model
+            unusable = (
+                not reported
+                or reported.startswith(f"{player.device_type}:")
+                or (reported != model and model.startswith(reported))
+            )
+            if not unusable:
                 return
-            name = player.device_model
+            name = model
         player._device_name = name  # noqa: SLF001
 
     async def _on_connected(self, player: SlimClient) -> None:
