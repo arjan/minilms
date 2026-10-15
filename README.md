@@ -35,19 +35,20 @@ Settings → Advanced → Networking → Remote Library.
 ## Docker
 
 ```sh
-docker compose up -d --build
+docker compose up -d
 docker compose logs -f
-docker kill -s HUP minilms   # reload config/stations.yaml
+docker kill -s HUP minilms   # reload the station list
 ```
 
 GitHub Actions runs the tests and publishes a multi-arch image (amd64, arm64)
 to `ghcr.io/arjan/minilms`: `latest` from `main`, a version tag for each
-`v*` git tag. To use it instead of building locally, replace `build: .` in
-`compose.yaml` with `image: ghcr.io/arjan/minilms:latest`.
+`v*` git tag. `compose.yaml` uses that image; to build one yourself, run
+`docker build -t minilms .`.
 
 The container uses host networking, because players find the server by UDP
-broadcast. `config/` is mounted read-only at `/config`; volume, power and the
-last station per player are kept in the `minilms-data` volume.
+broadcast. The image includes the default `config/stations.yaml`; to use your
+own, mount a directory with a `stations.yaml` at `/config`. Volume, power and
+the last station per player are kept in the `minilms-data` volume.
 
 ## Configuration
 

@@ -1,14 +1,15 @@
 services:
   minilms:
-    build: .
+    image: ghcr.io/arjan/minilms:latest
     container_name: minilms
     # Host networking: players find the server by UDP broadcast on 3483,
     # and must reach slimproto 3483 and http 9000 (menus, streams, artwork).
     network_mode: host
     restart: unless-stopped
     volumes:
-      - ./config:/config:ro
       - minilms-data:/data
+      # Your own station list instead of the built-in one:
+      # - ./config:/config:ro
 
 volumes:
   minilms-data:

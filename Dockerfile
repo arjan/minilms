@@ -6,6 +6,8 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 COPY minilms ./minilms
 RUN uv sync --frozen --no-dev
+# Default stations; mount a directory over /config to use your own.
+COPY config/stations.yaml /config/stations.yaml
 
 RUN useradd --system --uid 10001 minilms && mkdir /data && chown minilms /data
 USER minilms
