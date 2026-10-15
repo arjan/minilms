@@ -1,0 +1,14 @@
+services:
+  minilms:
+    build: .
+    container_name: minilms
+    # Host networking: players find the server by UDP broadcast on 3483,
+    # and must reach slimproto 3483 and http 9000 (menus, streams, artwork).
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./config:/config:ro
+      - minilms-data:/data
+
+volumes:
+  minilms-data:

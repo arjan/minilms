@@ -1,0 +1,26 @@
+[project]
+name = "minilms"
+version = "0.1.0"
+description = "Radio-only server for Squeezebox players, built on aioslimproto"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+  "aioslimproto==3.2.3",
+  "aiohttp>=3.9.2",
+  "pyyaml>=6.0",
+  "pillow>=10",
+]
+
+[project.scripts]
+minilms = "minilms.__main__:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "pytest-aiohttp>=1.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

@@ -1,0 +1,126 @@
+# MiniLMS configuration. Works as is; every server setting is optional.
+# Reload with SIGHUP (docker kill -s HUP minilms).
+server:
+  name: MiniLMS
+  default_volume: 30   # 0-100, for players MiniLMS has not seen before
+  # Optional:
+  # ip_address: ...    # address players use for streams; default: the primary interface
+  # state_file: ...    # default state.json; the Docker image uses /data/state.json
+
+# Optional per-player names, by player id (MAC). Players that report no
+# usable name are named after their model, e.g. "Squeezebox Radio".
+# players:
+#   "00:04:20:xx:xx:xx":
+#     name: Kitchen
+
+# Dutch stations, streams checked on 2026-10-15. These are the stations'
+# direct streams, not TuneIn links (those often start with an ad pre-roll). Icons are TuneIn logos; minilms fetches, resizes and caches them.
+# The list order is the menu order. preset: 1-6 are the Radio's hardware buttons.
+stations:
+
+  # NPO, the national public broadcaster
+  - id: npo-radio-1
+    name: NPO Radio 1
+    url: https://icecast.omroep.nl/radio1-bb-mp3
+    icon: https://cdn-radiotime-logos.tunein.com/s17523q.png
+    preset: 1
+  - id: npo-radio-2
+    name: NPO Radio 2
+    url: https://icecast.omroep.nl/radio2-bb-mp3
+    icon: https://cdn-radiotime-logos.tunein.com/s9483q.png
+    preset: 2
+  - id: npo-3fm
+    name: NPO 3FM
+    url: https://icecast.omroep.nl/3fm-bb-mp3
+    icon: https://cdn-profiles.tunein.com/s6707/images/logoq.png
+    preset: 3
+
+  # Sky Radio, JOE, Radio 538
+  - id: sky-radio
+    name: Sky Radio
+    url: https://playerservices.streamtheworld.com/api/livestream-redirect/SKYRADIO.mp3
+    icon: https://cdn-profiles.tunein.com/s9067/images/logoq.jpg
+    preset: 4
+  - id: joe
+    name: JOE
+    url: https://stream.joe.nl/joe/mp3/
+    icon: https://cdn-profiles.tunein.com/s307829/images/logoq.png
+    preset: 5
+  - id: radio-538
+    name: Radio 538
+    url: https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO538.mp3
+    icon: https://cdn-radiotime-logos.tunein.com/s6712q.png
+    preset: 6
+
+  # Other pop and hits
+  - id: qmusic
+    name: Qmusic
+    url: https://stream.qmusic.nl/qmusic/mp3/
+    icon: https://cdn-radiotime-logos.tunein.com/s87683q.png
+  - id: 100-nl
+    name: 100% NL
+    url: https://stream.100p.nl/100pnl_aac
+    icon: https://cdn-radiotime-logos.tunein.com/s76590q.png
+  - id: radio-10
+    name: Radio 10
+    url: https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10.mp3
+    icon: https://cdn-radiotime-logos.tunein.com/s16793q.png
+  - id: veronica
+    name: Radio Veronica
+    url: https://stream.radioveronica.nl/veronica_aac
+    icon: https://cdn-radiotime-logos.tunein.com/s6717q.png
+  - id: slam
+    name: SLAM!
+    url: https://stream.slam.nl/slam_aac
+    icon: https://cdn-radiotime-logos.tunein.com/s67814q.png
+  - id: decibel
+    name: Decibel
+    url: https://playerservices.streamtheworld.com/api/livestream-redirect/RADIODECIBEL.mp3
+    icon: https://cdn-profiles.tunein.com/s65005/images/logoq.jpg
+  - id: sky-radio-hits
+    name: Sky Radio Hits
+    url: https://nl-playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR01.mp3
+    icon: https://cdn-radiotime-logos.tunein.com/s224032q.png
+
+  # Rock, soul
+  - id: arrow
+    name: Arrow Classic Rock
+    url: https://stream.player.arrow.nl/arrow
+    icon: https://cdn-profiles.tunein.com/s6702/images/logoq.jpg
+  - id: kink
+    name: KINK
+    url: https://playerservices.streamtheworld.com/api/livestream-redirect/KINK.mp3
+  - id: sublime
+    name: Sublime
+    url: https://stream.sublime.nl/sublime_mp3
+    icon: https://cdn-radiotime-logos.tunein.com/s25777q.png
+
+  # Other NPO
+  - id: npo-klassiek
+    name: NPO Klassiek
+    url: https://icecast.omroep.nl/radio4-bb-mp3
+    icon: https://cdn-profiles.tunein.com/s25548/images/logoq.png
+  - id: npo-radio-5
+    name: NPO Radio 5
+    url: https://icecast.omroep.nl/radio5-bb-mp3
+    icon: https://cdn-profiles.tunein.com/s25544/images/logoq.png
+  - id: npo-funx
+    name: NPO FunX
+    url: https://icecast.omroep.nl/funx-bb-mp3
+    icon: https://cdn-profiles.tunein.com/s48069/images/logoq.jpg
+
+  # News
+  - id: bnr
+    name: BNR Nieuwsradio
+    url: https://stream.bnr.nl/bnr_mp3_128_04
+    icon: https://cdn-profiles.tunein.com/s1993/images/logoq.png
+
+  # Regional (Gelderland)
+  - id: radio-gelderland
+    name: Radio Gelderland
+    url: https://d2od87akyl46nm.cloudfront.net/icecast/omroepgelderland/radiogelderland
+    icon: https://cdn-profiles.tunein.com/s37111/images/logoq.png
+  - id: rtv-connect
+    name: RTV Connect
+    url: https://stream.rtvconnect.nl/radio/8000/ffm-320-mp3
+    icon: https://cdn-profiles.tunein.com/s81358/images/logoq.png
