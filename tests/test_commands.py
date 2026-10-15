@@ -112,6 +112,25 @@ async def test_status_keeps_non_empty_item_loop(handler):
     assert await handler(cmd("status", "-", 1, menu="menu")) == {"item_loop": [{"text": "x"}]}
 
 
+async def test_status_drops_empty_track_fields(handler):
+    track = {"title": "T", "duration": "", "bitrate": "", "samplerate": "", "samplesize": "", "remote": 1}
+    handler.app.server.cli._handle_status.return_value = {"playlist_loop": [track]}
+    result = await handler(cmd("status", "-", 1, tags="xcfldatgrKN"))
+    assert result["playlist_loop"] == [{"title": "T", "remote": 1}]
+
+
+async def test_status_for_unknown_player_passes_through(handler):
+    handler.app.server.cli._handle_status.return_value = None
+    assert await handler(cmd("status", "-", 1)) is None
+
+
+async def test_home_assistant_capability_queries(handler):
+    assert await handler(cmd("playerpref", "alarmsEnabled", "?")) == {"_p2": "0"}
+    assert await handler(cmd("can", "restartserver", "?", player=None)) == {"_can": 0}
+    with pytest.raises(NotImplementedError):
+        await handler(cmd("playerpref", "volume", "?"))
+
+
 async def test_unknown_command_falls_through(handler):
     with pytest.raises(NotImplementedError):
         await handler(cmd("mixer", "volume", "?"))

@@ -20,6 +20,7 @@ LOGGER = logging.getLogger(__name__)
 RADIO_NODE = "radios"
 MUSIC_NODE = "myMusic"
 SERVER_VERSION = "9.0.0"
+EMPTY_TRACK_FIELDS = ("duration", "bitrate", "samplerate", "samplesize")
 
 
 def _int(value: Any, default: int) -> int:
@@ -127,9 +128,27 @@ class CommandHandler:
         )
         # With nothing playing aioslimproto sends "item_loop": [], and
         # SqueezePlay's _whatsPlaying() then indexes item_loop[1] and crashes.
-        if isinstance(result, dict) and result.get("item_loop") == []:
+        if not isinstance(result, dict):
+            return result  # None for an unknown player
+        if result.get("item_loop") == []:
             del result["item_loop"]
+        # aioslimproto sends "" for these on radio streams; LMS leaves them out.
+        # pysqueezebox does float(track["duration"]) when the key is present.
+        for track in result.get("playlist_loop") or []:
+            for key in EMPTY_TRACK_FIELDS:
+                if track.get(key) == "":
+                    del track[key]
         return result
+
+    async def cmd_playerpref(self, cmd: SlimCLICommand) -> dict[str, Any]:
+        # Home Assistant asks for the alarm switch; MiniLMS runs no alarms.
+        if cmd.args[:2] == ["alarmsEnabled", "?"]:
+            return {"_p2": "0"}
+        raise NotImplementedError("playerpref")
+
+    async def cmd_can(self, cmd: SlimCLICommand) -> dict[str, Any]:
+        # e.g. Home Assistant's "can restartserver ?": nothing optional is supported.
+        return {"_can": 0}
 
     async def cmd_alarms(self, cmd: SlimCLICommand) -> dict[str, Any]:
         return {"count": 0, "fade": "0", "alarms_loop": []}
